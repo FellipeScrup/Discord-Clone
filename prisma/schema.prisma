@@ -23,18 +23,17 @@ model Profile {
   updatedAt DateTime @updatedAt
 }
 
-model Server{
+model Server {
   id String @id @default(uuid())
   name String
   imageUrl String @db.Text
-  inviteCode String @db.Text
-
+  inviteCode String @unique
 
   profileId String
-  profile Profile @relation(fields: [profileId], references:[id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   members Member[]
-  Channels Channel[]
+  channels Channel[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -42,13 +41,13 @@ model Server{
   @@index([profileId])
 }
 
-enum MemberRole{
+enum MemberRole {
   ADMIN
   MODERATOR
   GUEST
 }
 
-model Member{
+model Member {
   id String @id @default(uuid())
   role MemberRole @default(GUEST)
 
@@ -57,6 +56,9 @@ model Member{
 
   serverId String
   server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  messages Message[]
+
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -82,9 +84,34 @@ model Channel {
   serverId String
   server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
 
-  CreatedAt DateTime @default(now())
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([profileId])
   @@index([serverId])
-
 }
+
+model Message {
+  id String @id @default(uuid())
+  content String @db.Text
+
+  fileUrl String? @db.Text
+
+  memberId String
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  channelId String
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  deleted Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([channelId])
+  @@index([memberId])
+}
+
+
