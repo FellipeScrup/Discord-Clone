@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { LiveKitRoom, VideoConference } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Channel } from "@prisma/client";
-import { useUser } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
 
 interface MediaRoomProps {
@@ -14,26 +12,37 @@ interface MediaRoomProps {
 }
 
 export const MediaRoom = ({ chatId, video, audio }: MediaRoomProps) => {
-  const { user } = useUser();
   const [token, setToken] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!user?.firstName || !user.lastName) return;
-
-    const name = `${user.firstName} ${user.lastName}`;
-
     (async () => {
       try {
-        const resp = await fetch(
-          `/api/livekit?room=${chatId}&username=${name}`
-        );
+        const resp = await fetch(`/api/livekit?room=${chatId}`);
         const data = await resp.json();
         setToken(data.token);
       } catch (e) {
         console.log(e);
       }
     })();
-  }, [user?.firstName, user?.lastName, chatId]);
+  }, [chatId]);
+
+  if (error) {
+    return (
+      <div className="flex flex-col flex-1 justify-center items-center gap-y-2">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          The call was disconnected.
+        </p>
+        <button
+          onClick={() => setError("")}
+          className="text-xs text-indigo-500 hover:underline"
+          type="button"
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
 
   if (token === "") {
     return (
@@ -52,6 +61,7 @@ export const MediaRoom = ({ chatId, video, audio }: MediaRoomProps) => {
       connect={true}
       video={video}
       audio={audio}
+      onError={(err) => setError(err.message)}
     >
       <VideoConference />
     </LiveKitRoom>

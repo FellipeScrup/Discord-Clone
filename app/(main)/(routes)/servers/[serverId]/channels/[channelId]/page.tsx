@@ -1,5 +1,4 @@
 import { currentProfile } from "@/lib/current-profile";
-import { redirectToSignIn } from "@clerk/nextjs";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { ChatHeader } from "@/components/chat/chat-header";
@@ -19,7 +18,7 @@ const ChannelIdPage = async ({ params }: ChannelIdPageProps) => {
   const profile = await currentProfile();
 
   if (!profile) {
-    return redirectToSignIn();
+    return redirect("/sign-in");
   }
 
   const channel = await db.channel.findUnique({
@@ -49,7 +48,10 @@ const ChannelIdPage = async ({ params }: ChannelIdPageProps) => {
       {channel.type === ChannelType.TEXT && (
         <>
           <ChatMessages
-            member={member}
+            source="member"
+            currentId={member.id}
+            currentRole={member.role}
+            serverId={channel.serverId}
             name={channel.name}
             chatId={channel.id}
             type="channel"

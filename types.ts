@@ -7,6 +7,16 @@ export type ServerWithMembersWithProfiles = Server & {
   members: (Member & { profile: Profile })[];
 };
 
+export type MessageAuthor = {
+  id: string;
+  name: string;
+  imageUrl: string;
+};
+
+export type FriendProfile = MessageAuthor & {
+  username: string;
+};
+
 export type NextApiResponseServerIo = NextApiResponse & {
   socket: Socket & {
     server: NetServer & {

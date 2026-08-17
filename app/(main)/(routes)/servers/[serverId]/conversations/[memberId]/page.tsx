@@ -5,7 +5,6 @@ import { MediaRoom } from "@/components/media-room";
 import { getOrCreateConversation } from "@/lib/conversation";
 import { currentProfile } from "@/lib/current-profile";
 import { db } from "@/lib/db";
-import { redirectToSignIn } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 interface MemberIdPageProps {
@@ -22,7 +21,7 @@ const MemberIdPage = async ({ params, searchParams }: MemberIdPageProps) => {
   const profile = await currentProfile();
 
   if (!profile) {
-    return redirectToSignIn();
+    return redirect("/sign-in");
   }
 
   const currentMember = await db.member.findFirst({
@@ -71,7 +70,10 @@ const MemberIdPage = async ({ params, searchParams }: MemberIdPageProps) => {
       {!searchParams.video && (
         <>
           <ChatMessages
-            member={currentMember}
+            source="member"
+            currentId={currentMember.id}
+            currentRole={currentMember.role}
+            serverId={params.serverId}
             name={otherMember.profile.name}
             chatId={conversation.id}
             type="conversation"
