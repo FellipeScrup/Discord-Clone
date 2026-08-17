@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { ServerSection } from "./server-section";
 import { ServerChannel } from "./server-channel";
 import { ServerMember } from "./server-member";
+import { ChannelParticipants } from "./channel-participants";
 
 interface ServerSidebarProps {
   serverId: string;
@@ -157,12 +158,17 @@ export const ServerSidebar = async ({ serverId }: ServerSidebarProps) => {
             />
             <div className="space-y-[2px]">
             {audioChannels.map((channel) => (
-              <ServerChannel
-                key={channel.id}
-                channel={channel}
-                role={role}
-                server={server}
-              />
+              <div key={channel.id}>
+                <ServerChannel
+                  channel={channel}
+                  role={role}
+                  server={server}
+                />
+                <ChannelParticipants
+                  serverId={server.id}
+                  channelId={channel.id}
+                />
+              </div>
             ))}
             </div>
           </div>
@@ -178,12 +184,17 @@ export const ServerSidebar = async ({ serverId }: ServerSidebarProps) => {
             />
             <div className="space-y-[2px]">
             {videoChannels.map((channel) => (
-              <ServerChannel
-                key={channel.id}
-                channel={channel}
-                role={role}
-                server={server}
-              />
+              <div key={channel.id}>
+                <ServerChannel
+                  channel={channel}
+                  role={role}
+                  server={server}
+                />
+                <ChannelParticipants
+                  serverId={server.id}
+                  channelId={channel.id}
+                />
+              </div>
             ))}
             </div>
           </div>
